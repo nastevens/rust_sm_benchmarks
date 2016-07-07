@@ -1,39 +1,44 @@
 use std::mem;
 
+trait StateHandler {
+    fn handle(&mut self) -> StateHandlerEnum;
+    fn done(&self) -> bool { false }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 enum StateHandlerEnum {
     State1(State1),
     Done(Done),
+    // 
+    NoState,
 }
 
-impl StateHandlerEnum {
-    fn dispatch(&mut self) {
+impl StateHandler for StateHandlerEnum {
+    fn handle(&mut self) -> StateHandlerEnum {
         let next = match self {
             &mut StateHandlerEnum::State1(ref mut s) => s.handle(),
             &mut StateHandlerEnum::Done(ref mut s) => s.handle(),
+            &mut StateHandlerEnum::NoState => panic!(),
         };
         mem::replace(self, next);
+        StateHandlerEnum::NoState
     }
 
     fn done(&self) -> bool {
         match self {
-            &StateHandlerEnum::Done(_) => true,
-            _ => false,
+            &StateHandlerEnum::State1(ref s) => s.done(),
+            &StateHandlerEnum::Done(ref s) => s.done(),
+            &StateHandlerEnum::NoState => panic!(),
         }
     }
 }
-
-trait StateHandler {
-    fn handle(&self) -> StateHandlerEnum;
-}
-
 #[derive(Clone, Copy, Debug, PartialEq)]
 struct State1 {
     counter: usize
 }
 
 impl StateHandler for State1 {
-    fn handle(&self) -> StateHandlerEnum {
+    fn handle(&mut self) -> StateHandlerEnum {
         if self.counter > 1_000_000 {
             Done::state(self.counter)
         } else {
@@ -56,9 +61,11 @@ struct Done {
 }
 
 impl StateHandler for Done {
-    fn handle(&self) -> StateHandlerEnum {
+    fn handle(&mut self) -> StateHandlerEnum {
         Done::state(self.counter)
     }
+
+    fn done(&self) -> bool { true }
 }
 
 impl Done {
@@ -70,9 +77,9 @@ impl Done {
 }
 
 pub fn run() -> usize {
-    let mut state: StateHandlerEnum = StateHandlerEnum::State1(State1 { counter: 0 });
+    let mut state: StateHandlerEnum = State1::state(0);
     while !state.done() {
-        state.dispatch();
+        state.handle();
     }
     match state {
         StateHandlerEnum::Done(Done{counter}) => counter,
