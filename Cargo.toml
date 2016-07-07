@@ -1,0 +1,6 @@
+[package]
+name = "state_machine_benches"
+version = "0.1.0"
+authors = ["Nick Stevens <nick@bitcurry.com>"]
+
+[dependencies]
