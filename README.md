@@ -38,6 +38,7 @@ those structs. All state must be kept external and passed to each function.
 Pros:
   - Low boilerplate
   - Open to addition of new states
+
 Cons:
   - All mutable state must be kept externally to state objects
 
@@ -51,6 +52,7 @@ the old state is replaced with the new state using mem::replace.
 
 Pros:
   - Best performance
+
 Cons:
   - Requires extra "dispatch" step for each event type
   - Extra states must be added to module-wide enum
