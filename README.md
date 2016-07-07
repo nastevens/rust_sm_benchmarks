@@ -30,25 +30,12 @@ Cons:
   - Least performant by an order of magnitude
 
 
-## Static references to states
-
-Models all states as unit structs and switches based on static references to
-those structs. All state must be kept external and passed to each function.
-
-Pros:
-  - Low boilerplate
-  - Open to addition of new states
-
-Cons:
-  - All mutable state must be kept externally to state objects
-
-
 ## `mem::replace` enum
 
 Models all states as their own objects, allowing unique variables to be
 associated with each state. All states are then collected in an enum wrapper
-type, and with event functions returning a new state + enum.  At the top level,
-the old state is replaced with the new state using mem::replace.
+type, with event functions returning a new state + enum wrapper.  At the top
+level, the old state is replaced with the new state using `mem::replace`.
 
 Pros:
   - Best performance
@@ -57,6 +44,20 @@ Cons:
   - Requires extra "dispatch" step for each event type
   - Extra states must be added to module-wide enum
   - Return types from handler functions must be wrapped with enum type
+
+
+## Static references to states
+
+Models all states as unit structs and switches based on static references to
+those structs. All state variables must be kept external and passed to each
+function.
+
+Pros:
+  - Low boilerplate
+  - Open to addition of new states
+
+Cons:
+  - All state variables must be kept external to state objects
 
 
 # License
